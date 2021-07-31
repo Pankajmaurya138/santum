@@ -12,6 +12,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\InviteRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\VerifyOtpRequest;
+use App\Http\Requests\ProfileRequest;
 use Hash;
 use Image;
 
@@ -111,10 +112,9 @@ class RegisterController extends BaseController
         }
     }
 
-    public function profileUpdate(Request $request) {
+    public function profileUpdate(ProfileRequest $request) {
        try {
             $input = $request->all();
-            // dd($input);
             $user=$user_details = auth()->user();
             if(!empty($user)){
                 if($request->hasFile('avatar')) {
@@ -146,12 +146,20 @@ class RegisterController extends BaseController
              
                     // you can save crop image path below in database
                     $path = asset('storage/avatars/crop/'.$filenametostore);
+
+                    $user = $user->update([
+                        'name'=>$input['name'],
+                        'user_name'=>$input['user_name'],
+                        'avatar'=>$path,
+                    ]);
+                }else{
+                    $user = $user->update([
+                        'name'=>$input['name'],
+                        'user_name'=>$input['user_name'],
+                    ]);
                 }
-                $user = $user->update([
-                    'name'=>$input['name'],
-                    'user_name'=>$input['user_name'],
-                    'avatar'=>$path,
-                ]);
+               
+                
                 return $this->sendResponse($user_details, 'User profile updated successfully.');
             }else{
                 return $this->sendError('Unauthorized',401);
