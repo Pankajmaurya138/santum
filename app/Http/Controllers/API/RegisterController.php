@@ -21,15 +21,19 @@ class RegisterController extends BaseController
     /* login*/
 
     public function login(LoginRequest $request){
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password,'status'=>1])){ 
-            $user = Auth::user(); 
-            $data['token'] =  $user->createToken('MyApp')->plainTextToken; 
-            $data['user'] =  $user;
-            return $this->sendResponse($data, 'User login successfully.');
-        } 
-        else{ 
-            return $this->sendError('Unauthorized',401);
-        } 
+        try{
+            if(Auth::attempt(['email' => $request->email, 'password' => $request->password,'status'=>1])){ 
+                $user = Auth::user(); 
+                $data['token'] =  $user->createToken('MyApp')->plainTextToken; 
+                $data['user'] =  $user;
+                return $this->sendResponse($data, 'User login successfully.');
+            } 
+            else{ 
+                return $this->sendError('Unauthorized',401);
+            } 
+        }catch(Exception $e){
+            return $this->sendError('Something Went Wrong',500);
+        }
     }
 
     public function sendInvitionEmail(InviteRequest $request){
